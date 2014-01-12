@@ -33,6 +33,14 @@ function skewer() {
  * @param {Function} [callback] The callback to receive a response object
  */
 skewer.getJSON = function(url, callback) {
+    if (this.inBrowser) {
+        this.browserGetJSON(url,callback);
+    } else if (this.inNode) {
+        this.nodeGetJSON(url,callback);
+    } // TODO Handle else case
+};
+
+skewer.browserGetJSON = function(url, callback) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4 && xhr.status === 200) {
@@ -43,6 +51,16 @@ skewer.getJSON = function(url, callback) {
     xhr.send();
 };
 
+skewer.nodeGetJSON = function(url, callback) {
+    request.get({url:url,headers:{'User-Agent': 'request'}},
+                function(error,response,body){
+                    console.log('get res: '+response);
+                    console.log('get err: '+error);
+                    console.log('get body: '+body);
+                    callback(JSON.parse(body));
+                });
+};
+
 /**
  * Send a JSON-encoded object to a server.
  * @param {String} url The location of the remote server
@@ -50,6 +68,14 @@ skewer.getJSON = function(url, callback) {
  * @param {Function} [callback] The callback to receive a response object
  */
 skewer.postJSON = function(url, object, callback) {
+    if (this.inBrowser) {
+        this.browserPostJSON(url, object, callback);
+    } else if (this.inNode) {
+        this.nodePostJSON(url, object, callback);
+    } // TODO Handle else case
+};
+
+skewer.browserPostJSON = function(url, object, callback) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
         if (callback && xhr.readyState === 4 && xhr.status === 200) {
@@ -59,6 +85,18 @@ skewer.postJSON = function(url, object, callback) {
     xhr.open('POST', url, true);
     xhr.setRequestHeader("Content-Type", "text/plain"); // CORS
     xhr.send(JSON.stringify(object));
+};
+
+skewer.nodePostJSON = function(url, object, callback) {
+    request.post({url:url,
+                  headers:{"Content-Type":"text/plain",
+                           "User-Agent": "request"},
+                  body:JSON.stringify(object)},
+                 function(error,response,body){
+                     if (callback) {
+                         callback(JSON.parse(body));
+                     }
+                 });
 };
 
 /**
@@ -238,11 +276,15 @@ skewer.fn.fetchselector = function(request) {
  * @type string
  */
 (function() {
-    var script = document.querySelector('script[src$="/skewer"]');
-    if (script) {
-        skewer.host = script.src.match(/\w+:\/\/[^/]+/)[0];
+    if (typeof document !== 'undefined') {
+        var script = document.querySelector('script[src$="/skewer"]');
+        if (script) {
+            skewer.host = script.src.match(/\w+:\/\/[^/]+/)[0];
+        } else {
+            skewer.host = '';  // default to the current host
+        }
     } else {
-        skewer.host = '';  // default to the current host
+        skewer.host = 'http://localhost:9191';
     }
 }());
 
@@ -374,18 +416,31 @@ skewer.errorResult = function(error, result, request) {
     });
 };
 
-if (window.addEventListener) {
-    window.addEventListener('error', skewer.error);
-    if (document.readyState === 'complete') {
-        skewer();
-    } else {
-        window.addEventListener('load', skewer);
-    }
-} else { // < IE9
-    window.attachEvent('onerror', skewer.error);
-    if (document.readyState === 'complete') {
-        skewer();
-    } else {
-        window.attachEvent('onload', skewer);
+if (typeof window != 'undefined') {
+    skewer.inBrowser = true;
+    if (window.addEventListener) {
+        window.addEventListener('error', skewer.error);
+        if (document.readyState === 'complete') {
+            skewer();
+        } else {
+            window.addEventListener('load', skewer);
+        }
+    } else { // < IE9
+        window.attachEvent('onerror', skewer.error);
+        if (document.readyState === 'complete') {
+            skewer();
+        } else {
+            window.attachEvent('onload', skewer);
+        }
     }
 }
+
+if (process) {
+    skewer.inNode = true;
+    request = require('request');
+    // TODO NodeJS exceptions are not like browser ErrorEvents
+    process.on('uncaughtException',skewer.error);
+    skewer();
+}
+
+// TODO Handle neither window nor process or if somehow, both...

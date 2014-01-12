@@ -1,0 +1,25 @@
+{
+  "name": "skewer-mode",
+  "version": "1.5.3",
+  "description": "NodeJS Support for Emacs' Skewer Mode",
+  "main": "skewer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skeeto/skewer-mode.git"
+  },
+  "keywords": [
+    "emacs"
+  ],
+  "author": "Ian Tegebo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/skeeto/skewer-mode/issues"
+  },
+  "homepage": "https://github.com/skeeto/skewer-mode",
+  "dependencies": {
+    "request": "~2.31.0"
+  }
+}
