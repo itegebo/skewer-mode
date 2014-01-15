@@ -141,6 +141,16 @@
 ;;;     * broadcast to browsers, e.g. for portability testing
 ;;;     * adding dev deps, persiting across restart/refreshes
 ;;;   * Message when no clients are connected
+;;;
+;;; request type
+;;;   shouldn't use 'eval' for what is actually a 'payload', e.g. the
+;;; "script" request is really passing an URL fragment to be placed in
+;;; a "src" attribute of a "script" element.
+;;;
+;;; Re: implementing skewer-load-buffer in NodeJS
+;;;   i realize that an ephemeral script tag is to the browser what a
+;;; repl .load statement is to node, i suppose i could do that, but
+;;; why not implement both in terms of whole-buffer eval?
 
 ;;; Code:
 
