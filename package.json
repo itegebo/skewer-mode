@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/skeeto/skewer-mode.git"
+    "url": "https://github.com/itegebo/skewer-mode.git"
   },
   "keywords": [
     "emacs"
@@ -16,10 +16,12 @@
   "author": "Ian Tegebo",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/skeeto/skewer-mode/issues"
+    "url": "https://github.com/itegebo/skewer-mode/issues"
   },
-  "homepage": "https://github.com/skeeto/skewer-mode",
+  "homepage": "https://github.com/itegebo/skewer-mode",
   "dependencies": {
-    "request": "~2.31.0"
+    "request": "~2.31.0",
+    "winston": "~0.7.2",
+    "bunyan": "~0.22.1"
   }
 }

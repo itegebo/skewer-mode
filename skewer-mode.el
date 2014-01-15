@@ -121,6 +121,27 @@
 ;;   * Fix stringification issues
 ;; Version 1.0: initial release
 
+;;; TODO
+;;;   * Handle NodeJS not supporting css/html request handlers
+;;;     * user-agent -> features?
+;;;   * Assign client ID, on connect
+;;;   * Clients advertise type/request handlers
+;;;   * Buffers "attach" clients
+;;;   * Should we tell clients to "refresh/restart"?
+;;;   * How do we store and collect logs?
+;;;   * In considering how the 'script' request type works, I believe
+;;;     it's unecessary when you have eval, and the added script tag
+;;;     appears not persist through refreshes.  This makes me wonder what the real use
+;;;     case is for skewer-load-buffer; why not just eval the whole file?
+;;;     Was it just a minor convenience?  Did you really mean to add the
+;;;     file as a "dependency" in the browser?  If so, we could use "named"
+;;;     client ids to maintain a list of such dependencies so they're
+;;;     available after refresh/restart.
+;;;   * Better Describe use cases
+;;;     * broadcast to browsers, e.g. for portability testing
+;;;     * adding dev deps, persiting across restart/refreshes
+;;;   * Message when no clients are connected
+
 ;;; Code:
 
 (require 'cl)
@@ -159,6 +180,8 @@ adding a new type handler.")
 catching messages from the browser with no associated
 callback. The response object is passed to the hook function.")
 
+;; This is used *both* for maintaining client request ID/callbacks as
+;; well as the cached scripts set by skewer-load-buffer.
 (defvar skewer-timeout 3600
   "Maximum time to wait on the browser to respond, in seconds.")
 

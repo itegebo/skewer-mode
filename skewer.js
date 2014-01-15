@@ -1,3 +1,9 @@
+var logger = require('winston');
+
+logger.add(logger.transports.File, { filename: 'node-skewer.log',
+                               level: 'debug' });
+logger.remove(logger.transports.Console);
+
 /**
  * @fileOverview Live browser interaction with Emacs
  * @version 1.4
@@ -7,6 +13,9 @@
  * Connects to Emacs and waits for a request. After handling the
  * request it sends back the results and queues itself for another
  * request.
+ *
+ * Surprisingly, the first request is the only GET, and all subsequent
+ * ones are POST.
  * @namespace Holds all of Skewer's functionality.
  */
 function skewer() {
@@ -54,9 +63,7 @@ skewer.browserGetJSON = function(url, callback) {
 skewer.nodeGetJSON = function(url, callback) {
     request.get({url:url,headers:{'User-Agent': 'request'}},
                 function(error,response,body){
-                    console.log('get res: '+response);
-                    console.log('get err: '+error);
-                    console.log('get body: '+body);
+                    logger.debug('nodeGetJSON:'+body);
                     callback(JSON.parse(body));
                 });
 };
@@ -93,6 +100,7 @@ skewer.nodePostJSON = function(url, object, callback) {
                            "User-Agent": "request"},
                   body:JSON.stringify(object)},
                  function(error,response,body){
+                     logger.debug('nodePostJSON:'+body);
                      if (callback) {
                          callback(JSON.parse(body));
                      }
@@ -439,6 +447,7 @@ if (process) {
     skewer.inNode = true;
     request = require('request');
     // TODO NodeJS exceptions are not like browser ErrorEvents
+    // TODO Restart in case of exception?
     process.on('uncaughtException',skewer.error);
     skewer();
 }
