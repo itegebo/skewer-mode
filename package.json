@@ -22,6 +22,7 @@
   "dependencies": {
     "request": "~2.31.0",
     "winston": "~0.7.2",
-    "bunyan": "~0.22.1"
+    "bunyan": "~0.22.1",
+    "esprima": "~1.0.4"
   }
 }
